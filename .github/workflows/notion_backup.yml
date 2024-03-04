@@ -29,24 +29,27 @@ jobs:
         run: npm install -g notion-backup
 
       - name: Run backup
-        run: |
-          notion-backup 2> error.log || true # Перенаправление stderr в файл
+        run: notion-backup
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_FILE_TOKEN: ${{ secrets.NOTION_FILE_TOKEN }}
           NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
           NODE_OPTIONS: "--max-http-header-size 15000"
 
-      - name: Extract error filenames
-        run: |
-          cat error.log | grep -oP "(?<=File error: ).*" > error_files.txt
-        continue-on-error: true # Продолжить выполнение, если файл error.log не существует
-
       - name: Delete zips
         run: |
           rm -f *.zip
           rm -f markdown/*-Part*.zip
           rm -f html/*-Part*.zip
+
+      - name: Check file names and skip long ones
+        run: |
+          find . -type f | while read -r file; do
+            if (( ${#file} > 255 )); then
+              echo "$file" >> skipped_files.txt
+              rm "$file"
+            fi
+          done
 
       - name: Commit changes
         run: |
