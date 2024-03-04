@@ -51,6 +51,14 @@ jobs:
             fi
           done
 
+      - name: Check error log and create error_files.txt
+        run: |
+          if [ -f error.log ]; then
+            cat error.log | grep -oP "(?<=File error: ).*" > error_files.txt
+          else
+            echo "error.log does not exist."
+          fi
+
       - name: Commit changes
         run: |
           git config user.name github-actions
