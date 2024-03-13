@@ -28,14 +28,6 @@ jobs:
       - name: Setup dependencies
         run: npm install -g notion-backup
 
-      - name: Run backup
-        run: notion-backup
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_FILE_TOKEN: ${{ secrets.NOTION_FILE_TOKEN }}
-          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
-          NODE_OPTIONS: "--max-http-header-size 15000"
-
       - name: Shorten long file names
         run: |
           find . -type f | while read -r file; do
@@ -44,6 +36,14 @@ jobs:
               mv "$file" "$short_file"
             fi
           done
+
+      - name: Run backup
+        run: notion-backup
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_FILE_TOKEN: ${{ secrets.NOTION_FILE_TOKEN }}
+          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+          NODE_OPTIONS: "--max-http-header-size 15000"
 
       - name: Delete zips
         run: |
