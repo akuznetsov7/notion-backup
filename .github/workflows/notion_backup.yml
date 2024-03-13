@@ -45,6 +45,14 @@ jobs:
           NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
           NODE_OPTIONS: "--max-http-header-size 15000"
 
+      - name: Move files to root directory
+        run: |
+          find . -type f | while read -r file; do
+            base=$(basename "$file")
+            new_file="${base// /_}"
+            mv "$file" "./$new_file"
+          done
+
       - name: Delete zips
         run: |
           rm -f *.zip
